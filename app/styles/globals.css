@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* WhatsApp color scheme */
+:root {
+  --whatsapp: #25D366;
+  --whatsapp-dark: #128C7E;
+  --whatsapp-light: #DCF8C6;
+  --whatsapp-teal: #075E54;
+}
+
+/* Custom hover animations */
+.hover-lift {
+  transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+}
+
+/* Custom font for hero heading - fallback to system fonts if The Silver Editorial is not available */
+@font-face {
+  font-family: 'The Silver Editorial';
+  src: local('The Silver Editorial');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Fade-in animation classes */
+.fade-in {
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+/* WhatsApp bubble styles */
+.chat-bubble-right {
+  background-color: var(--whatsapp-light);
+  border-radius: 10px 10px 0 10px;
+  padding: 8px 12px;
+  position: relative;
+  max-width: 80%;
+  align-self: flex-end;
+}
+
+.chat-bubble-left {
+  background-color: white;
+  border-radius: 10px 10px 10px 0;
+  padding: 8px 12px;
+  position: relative;
+  max-width: 80%;
+  align-self: flex-start;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+}
+
+/* Custom button styles */
+.btn-whatsapp {
+  @apply bg-whatsapp text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-whatsapp-dark transition-all duration-300;
+}
+
+.btn-outline-whatsapp {
+  @apply bg-white text-whatsapp border border-whatsapp font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-50 transition-all duration-300;
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes line-dash {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+/* Grid pattern for flow editor background */
+.bg-grid-pattern {
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.5;
+}
+
+/* Utility animation classes */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-line-dash {
+  animation: line-dash 15s linear infinite;
+} 

@@ -1,0 +1,313 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 142 70% 45%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 70% 45%;
+ 
+    --radius: 0.5rem;
+
+    --whatsapp: 142 70% 45%;
+    --whatsapp-dark: 142 70% 24%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* WhatsApp theme colors */
+.bg-whatsapp {
+  background-color: hsl(var(--whatsapp));
+}
+
+.bg-whatsapp-dark {
+  background-color: hsl(var(--whatsapp-dark));
+}
+
+.text-whatsapp {
+  color: hsl(var(--whatsapp));
+}
+
+.text-whatsapp-dark {
+  color: hsl(var(--whatsapp-dark));
+}
+
+.border-whatsapp {
+  border-color: hsl(var(--whatsapp));
+}
+
+.hover\:bg-whatsapp:hover {
+  background-color: hsl(var(--whatsapp));
+}
+
+.hover\:bg-whatsapp-dark:hover {
+  background-color: hsl(var(--whatsapp-dark));
+}
+
+.hover\:text-whatsapp:hover {
+  color: hsl(var(--whatsapp));
+}
+
+.focus\:ring-whatsapp:focus {
+  --tw-ring-color: hsl(var(--whatsapp));
+}
+
+/* Grid pattern for flow editor */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(209, 213, 219, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(209, 213, 219, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* WhatsApp theme colors */
+:root {
+  --whatsapp: #25D366;
+  --whatsapp-dark: #128C7E;
+  --whatsapp-light: #DCF8C6;
+  --whatsapp-blue: #34B7F1;
+}
+
+/* Flow editor grid pattern */
+.grid-pattern {
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+body {
+  background: rgb(var(--background-start-rgb));
+  overflow-y: auto;
+}
+
+/* Keyframes for animations */
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lineDash {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.animate-line-dash {
+  animation: lineDash 1.5s linear infinite;
+}
+
+/* Animation delay utilities for the typing indicator */
+.delay-0 {
+  animation-delay: 0s;
+}
+
+.delay-1 {
+  animation-delay: 0.3s;
+}
+
+.delay-2 {
+  animation-delay: 0.6s;
+}
+
+/* Hide scrollbars for a cleaner mobile experience */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Utility class for text-colors */
+.text-whatsapp {
+  color: var(--whatsapp);
+}
+
+.text-whatsapp-dark {
+  color: var(--whatsapp-dark);
+}
+
+.bg-whatsapp {
+  background-color: var(--whatsapp);
+}
+
+.bg-whatsapp-dark {
+  background-color: var(--whatsapp-dark);
+}
+
+.bg-whatsapp-light {
+  background-color: var(--whatsapp-light);
+}
+
+.hover\:bg-whatsapp-dark:hover {
+  background-color: var(--whatsapp-dark);
+}
+
+.hover\:text-whatsapp:hover {
+  color: var(--whatsapp);
+}
+
+/* Make sure the body has proper scrolling */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  overflow-y: auto;
+}
+
+/* Animation classes for the chat UI */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+
+/* Progress bar animation for steps */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+} 

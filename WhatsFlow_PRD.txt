@@ -1,0 +1,278 @@
+﻿✅ Product Requirements Document (PRD) for WhatsFlow
+________________
+
+
+🛠️ 1. Site Overview
+WhatsFlow is an AI-powered platform that enables businesses to create, customize, and deploy automated WhatsApp flows with ease. The platform combines conversational AI, drag-and-drop flow building, and real-time performance tracking into a seamless experience.
+The site will consist of the following primary sections:
+1. Landing Page:
+ The entry point where users learn about WhatsFlow’s capabilities. It introduces the product’s value proposition, highlights its features, and includes clear call-to-actions (CTAs) to guide users towards creating their WhatsApp flows.
+
+2. Conversational UI:
+ Once users click on the CTA from the landing page, they are directed to the AI-powered conversational interface. Here, the AI interacts with users in a chat-style format to gather their requirements, goals, and preferences. This interaction helps the AI understand what type of WhatsApp flow the user needs for their business.
+
+3. Playground:
+ After the conversation, users are guided to the playground, which is the flow-building workspace. This section consists of:
+
+   * Chat box (left side): The conversational interface continues to assist users with real-time flow adjustments and suggestions.
+   * Flow builder (middle): A visual space where the auto-generated WhatsApp flow is displayed. Users can modify it using drag-and-drop functionality, adding or editing nodes, conditions, and branches.
+   * Real-time preview (right side): A live simulation that shows how the flow will appear and behave for the end user. This lets businesses visualize customer interactions in real-time.
+   4. Deployment:
+ Once the flow is ready, users can instantly deploy it via the WhatsApp Business API.
+
+   5. Dashboard:
+ After deployment, users can monitor the performance of their flows through the dashboard. It provides key performance indicators (KPIs) such as message delivery rates, customer engagement, and conversions. The dashboard also includes A/B testing functionality, allowing users to compare multiple flow versions and choose the one that performs best.
+
+________________
+
+
+🌐 2. User Flow
+The WhatsFlow user journey consists of the following steps:
+Landing Page Flow
+When users arrive at the website, they are greeted by a visually appealing landing page with a clean and modern design. The landing page contains:
+      * Hero Section:
+ The first section users see. It features the WhatsFlow logo, a catchy tagline like:
+"Automate Your WhatsApp Conversations with AI-Powered Flows"
+ Below the tagline, there is a clear CTA button labeled:
+“Create Your Flow”
+ This button directs users to the conversational interface.
+
+      * About Us Section:
+ A brief introduction to WhatsFlow explaining the problem it solves:
+“WhatsFlow helps businesses automate customer interactions on WhatsApp with AI-generated, customizable flows. Say goodbye to manual responses and hello to streamlined, efficient communication.”
+
+      * Features Section:
+ This section highlights WhatsFlow’s core capabilities with icons and short descriptions, such as:
+
+         * AI-powered flow generation
+         * Drag-and-drop customization
+         * Real-time preview
+         * One-click deployment
+         * Flow performance tracking and A/B testing
+         * Footer Section:
+ Contains essential links (Privacy Policy, Terms of Service, Contact Us) along with social media handles.
+
+Conversational AI Flow
+When users click the "Create Your Flow" CTA, they are directed to the conversational interface.
+            * The AI introduces itself and asks a series of natural, interactive questions to gather the necessary context.
+            * Example conversation:
+            * AI: "Hi! What kind of WhatsApp flow are you looking to create today? Customer support, sales, or something else?"
+            * User: "Sales follow-up flow for my e-commerce store."
+            * AI: "Got it! Do you want to include automated responses for abandoned carts or special discount offers?"
+            * As the conversation progresses, the AI extracts the user's business needs, flow structure, and preferences.
+At the end of the conversation, the AI presents a CTA like:
+“Generate Your Flow”
+ When users click this button, they are navigated to the playground section where the pre-generated flow is displayed.
+Playground Flow
+In the playground, users interact with a three-section layout:
+            * Left Section (Chat Box):
+ The chat box remains active, allowing the AI to provide real-time flow suggestions or guide users on how to modify specific steps.
+
+            * Middle Section (Flow Builder):
+ The AI-generated WhatsApp flow is displayed using React Flow.
+
+               * Users can drag and drop nodes representing different actions, such as:
+               * Message nodes (send text, image, video)
+               * Condition nodes (if/else branches)
+               * Delay nodes (wait X minutes/hours)
+               * Users can rearrange, edit, or add new nodes as they see fit.
+               * Right Section (Real-time Preview):
+ Users can see how the flow behaves from a customer’s perspective.
+
+                  * Example: If a customer selects a product category, the preview shows the automated message flow in real-time.
+Flow Deployment and Tracking
+After completing their flow, users can click “Deploy Flow”, which automatically integrates the flow with the WhatsApp Business API.
+                  * Once deployed, users can view real-time analytics on the dashboard, including customer interactions, response rates, and overall performance.
+                  * The dashboard offers A/B testing, allowing users to compare multiple flows side by side and choose the most effective one.
+________________
+
+
+
+
+________________
+
+
+🔥 4. Core Features
+                  * Conversational AI Interface:
+ Users can describe their desired WhatsApp flow in plain language, and the AI generates a flow based on their requirements.
+
+                  * Drag-and-Drop Flow Builder:
+ The playground offers a visual, intuitive way to customize flows.
+
+                  * Real-time Preview:
+ Users can simulate customer interactions and see the flow in action.
+
+                  * One-Click Deployment:
+ Instantly deploy flows to WhatsApp without technical complexity.
+
+                  * Flow Analytics and Tracking:
+ Monitor KPIs like delivery rates, open rates, and customer engagement.
+
+                  * A/B Testing:
+ Compare multiple flows to identify the highest-performing one.
+
+________________
+
+
+
+
+✅ In-Scope vs Out-of-Scope for WhatsFlow – Detailed Breakdown
+________________
+
+
+🛠️ In-Scope Features (Current Phase)
+These are the core features and functionalities that will be part of WhatsFlow's initial release or MVP. These items are essential to the product's primary goal: enabling businesses to create, customize, and deploy WhatsApp flows with AI-powered automation, while providing real-time preview and performance analytics.
+________________
+
+
+🔥 1. Conversational AI Interface
+The platform will include a conversational UI where the AI interacts with users in real-time. This interface will serve as the first point of contact for users after they click the CTA on the landing page.
+                     * Purpose:
+ The goal of the conversational AI is to gather contextual information about the user’s business needs, goals, and preferences for their WhatsApp flow.
+
+                     * Functionality:
+
+                        * The AI will ask structured questions such as:
+                        * “What kind of flow are you building? (Customer support, sales, etc.)”
+                        * “Do you need automated replies for FAQs or lead generation?”
+                        * The AI will analyze the conversation and auto-generate a WhatsApp flow accordingly.
+                        * This flow will be sent to the playground for further customization.
+________________
+
+
+🔥 2. Drag-and-Drop Flow Builder
+The core playground functionality will allow users to customize their WhatsApp flow with a visual, drag-and-drop interface. This is a key feature of WhatsFlow.
+                        * Purpose:
+ To give users full control over their WhatsApp flow’s structure by allowing them to visually add, remove, and edit nodes.
+
+                        * Functionality:
+
+                           * Node Types:
+                           * Message nodes (send text, image, video, or document)
+                           * Condition nodes (for branching logic, e.g., if/else)
+                           * Delay nodes (for adding time intervals between messages)
+                           * Flow Customization:
+                           * Users can rearrange the nodes, adjust conditions, and edit message content.
+                           * Drag-and-drop functionality ensures smooth modification.
+________________
+
+
+🔥 3. Real-Time Preview
+The preview section in the playground will allow users to see their WhatsApp flow in action in real-time.
+                           * Purpose:
+ To give users a live simulation of how their customers will experience the flow.
+
+                           * Functionality:
+
+                              * As users edit their flow, the preview will dynamically update to reflect changes.
+                              * The preview will simulate customer interactions, showing responses and flow transitions.
+                              * Users can validate the flow’s logic and effectiveness before deployment.
+________________
+
+
+🔥 4. One-Click Deployment with WhatsApp Business API
+WhatsFlow will integrate with the WhatsApp Business API to allow seamless deployment of flows.
+                              * Purpose:
+ To enable users to deploy their automated flows on WhatsApp without technical complexity instantly.
+
+                              * Functionality:
+
+                                 * Users will click a “Deploy Flow” button.
+                                 * The system will automatically connect to the WhatsApp Business API and activate the flow.
+                                 * The flow will become live and ready for customer interactions.
+________________
+
+
+🔥 5. Flow Analytics and Dashboard
+WhatsFlow will include a dashboard where users can monitor the performance of their flows.
+                                 * Purpose:
+ To give users data-driven insights into how their WhatsApp flows are performing.
+
+                                 * Functionality:
+
+                                    * Users can view KPIs such as:
+                                    * Message delivery rate
+                                    * Open rate
+                                    * Customer engagement (response rate)
+                                    * Conversion metrics (leads captured, sales generated)
+                                    * Users can identify and optimize underperforming flows based on these metrics.
+________________
+
+
+🔥 6. A/B Testing
+The dashboard will include A/B testing functionality, allowing users to compare different versions of their WhatsApp flow.
+                                    * Purpose:
+ To help businesses identify the most effective flow through performance comparison.
+
+                                    * Functionality:
+
+                                       * Users can duplicate flows and modify one version slightly (e.g., changing message wording or sequence).
+                                       * The system will split traffic between the two versions.
+                                       * Users can analyze which version drives better engagement or conversions.
+                                       * This helps in making data-backed decisions.
+________________
+
+
+🔥 7. Authentication and User Management
+The platform will include authentication and user management through Clerk.
+                                       * Purpose:
+ To provide a secure and personalized experience for users.
+
+                                       * Functionality:
+
+                                          * Users can sign up, log in, and manage their accounts.
+                                          * The platform will store user preferences, saved flows, and analytics data.
+                                          * User authentication ensures data privacy and security.
+________________
+
+
+🚫 Out-of-Scope Features (Phase 2 or Future Versions)
+These are functionalities or enhancements that are not part of the current phase or MVP. They may be added in future iterations but will not be included in the initial release.
+________________
+
+
+❌ 1. Multi-Language Support
+For the MVP, WhatsFlow will be available in English only.
+                                          * Multi-language support (e.g., Spanish, French, Hindi) is considered out of scope for the first release.
+                                          * This feature will be included in a future version to cater to global markets.
+________________
+
+
+❌ 2. Advanced Marketing Automation
+While WhatsFlow will automate WhatsApp flows, advanced marketing automation capabilities will be out of scope initially.
+                                          * Features like CRM integration, lead scoring, and customer segmentation will not be included in the MVP.
+                                          * In the future, marketing automation features could be added to help businesses nurture leads and personalize communication.
+________________
+
+
+❌ 3. Integration with Other Messaging Platforms
+WhatsFlow will only support WhatsApp in the initial release.
+                                          * Integration with Telegram, Facebook Messenger, or Instagram DM will be out of scope.
+                                          * Expanding to other platforms will be considered in future phases.
+________________
+
+
+❌ 4. AI-Powered Customer Sentiment Analysis
+The AI in the current version will focus on flow generation and real-time assistance.
+                                          * Sentiment analysis (detecting customer emotions from text) will be out of scope.
+                                          * This feature may be added later to enhance customer support insights.
+________________
+
+
+❌ 5. Complex User Role Management
+In the MVP, WhatsFlow will offer basic user management (authentication and individual profiles).
+                                          * Complex role-based access control (RBAC), such as admin, editor, and viewer roles, will not be part of the initial release.
+                                          * Advanced role management will be introduced in later versions.
+________________
+
+
+❌ 6. Pre-built Flow Templates
+Initially, the platform will auto-generate flows based on conversations.
+                                          * Pre-built industry-specific templates (e.g., e-commerce, hospitality) will be out of scope for the first release.
+                                          * These can be introduced later to offer ready-made solutions.
+________________
+
+
+🚀 Key Takeaway
+                                          * In-Scope: Core functionalities necessary for WhatsFlow’s MVP, ensuring a seamless experience for creating, customizing, and deploying WhatsApp flows.
+                                          * Out-of-Scope: Advanced and complementary features that will be introduced in future phases, providing more flexibility, personalization, and scalability.
