@@ -117,6 +117,16 @@ type PreviewMessage = {
   options?: string[];
 };
 
+// Improve the type safety of findIndex to prevent 'never' type issues
+type SafeFlowNode = FlowNode & {
+  data: NodeData;
+};
+
+// Cast function to safely access node data
+const safeGetNodeData = (node: FlowNode | undefined): NodeData => {
+  return (node as SafeFlowNode)?.data || { content: '', options: [] };
+};
+
 export default function PlaygroundPage() {
   const [flowDescription, setFlowDescription] = useState('');
   const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
@@ -177,13 +187,25 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        // Check if flowData.nodes[0] exists before accessing its properties
-        if (flowData.nodes.length > 0 && flowData.nodes[0]?.data?.content) {
-          const nextMessage = flowData.nodes[0].data.content.replace('{subscriber_name}', previewMessage);
-          addPreviewMessage({ text: nextMessage, isUser: false });
-          setCurrentNode(1);
-        } else {
-          // Fallback in case there's no data
+        try {
+          // Use a safe way to access the data that won't cause TypeScript errors
+          const node = flowData.nodes[0];
+          const nodeData = safeGetNodeData(node);
+          
+          if (nodeData.content) {
+            const nextMessage = nodeData.content.replace('{subscriber_name}', previewMessage);
+            addPreviewMessage({ text: nextMessage, isUser: false });
+            setCurrentNode(1);
+          } else {
+            // Fallback in case there's no data
+            addPreviewMessage({ 
+              text: `Thanks, ${previewMessage}! Let's continue with our conversation.`, 
+              isUser: false 
+            });
+            setCurrentNode(1);
+          }
+        } catch (error) {
+          // Just in case anything fails, provide a fallback
           addPreviewMessage({ 
             text: `Thanks, ${previewMessage}! Let's continue with our conversation.`, 
             isUser: false 
@@ -194,7 +216,8 @@ export default function PlaygroundPage() {
     } 
     else if (currentNodeData?.type === 'collect-info') {
       // Handle info collection
-      const fieldName = currentNodeData?.data?.field || '';
+      const nodeData = safeGetNodeData(currentNodeData);
+      const fieldName = nodeData.field || '';
       if (fieldName) {
         setUserVariables({...userVariables, [fieldName]: previewMessage});
         
@@ -203,11 +226,12 @@ export default function PlaygroundPage() {
           if (previewMessage.includes('@')) {
             // Valid email - show topics
             setTimeout(() => {
-              if (flowData.nodes.length > 3 && flowData.nodes[3]?.data) {
+              if (flowData.nodes.length > 3) {
+                const topicsNodeData = safeGetNodeData(flowData.nodes[3]);
                 addPreviewMessage({ 
-                  text: flowData.nodes[3].data.content || 'What topics are you interested in?', 
+                  text: topicsNodeData.content || 'What topics are you interested in?', 
                   isUser: false,
-                  options: flowData.nodes[3].data.options
+                  options: topicsNodeData.options
                 });
                 setCurrentNode(3);
               }
@@ -215,9 +239,10 @@ export default function PlaygroundPage() {
           } else {
             // Invalid email - show error
             setTimeout(() => {
-              if (flowData.nodes.length > 2 && flowData.nodes[2]?.data?.content) {
+              if (flowData.nodes.length > 2) {
+                const errorNodeData = safeGetNodeData(flowData.nodes[2]);
                 addPreviewMessage({ 
-                  text: flowData.nodes[2].data.content, 
+                  text: errorNodeData.content || "That doesn't look like a valid email address. Please provide a valid email to continue.", 
                   isUser: false 
                 });
               } else {
@@ -232,9 +257,10 @@ export default function PlaygroundPage() {
         } else if (fieldName === 'phone_number') {
           // Phone number collected - show discount code
           setTimeout(() => {
-            if (flowData.nodes.length > 8 && flowData.nodes[8]?.data?.content) {
+            if (flowData.nodes.length > 8) {
+              const discountNodeData = safeGetNodeData(flowData.nodes[8]);
               addPreviewMessage({ 
-                text: flowData.nodes[8].data.content, 
+                text: discountNodeData.content || 'Your discount code is WELCOME25!', 
                 isUser: false 
               });
               setCurrentNode(8);
@@ -246,21 +272,23 @@ export default function PlaygroundPage() {
     else if (currentNodeData?.type === 'multi-choice') {
       // Handle multiple choice response
       // Find the index of the selected option
-      const options = currentNodeData?.data?.options || [];
+      const nodeData = safeGetNodeData(currentNodeData);
+      const options = nodeData.options || [];
       const selectedIndex = options.findIndex(
         opt => previewMessage.toLowerCase().includes(opt.toLowerCase())
       );
       
-      const contentText = currentNodeData?.data?.content || '';
+      const contentText = nodeData.content || '';
       
       if (contentText.includes('topics')) {
         // After topics, ask about frequency
         setTimeout(() => {
-          if (flowData.nodes.length > 4 && flowData.nodes[4]?.data) {
+          if (flowData.nodes.length > 4) {
+            const frequencyNodeData = safeGetNodeData(flowData.nodes[4]);
             addPreviewMessage({ 
-              text: flowData.nodes[4].data.content || 'How often would you like to receive our newsletter?', 
+              text: frequencyNodeData.content || 'How often would you like to receive our newsletter?', 
               isUser: false,
-              options: flowData.nodes[4].data.options 
+              options: frequencyNodeData.options 
             });
             setCurrentNode(4);
           }
@@ -269,8 +297,9 @@ export default function PlaygroundPage() {
       else if (contentText.includes('frequency')) {
         // After frequency, show success message
         setTimeout(() => {
-          if (flowData.nodes.length > 5 && flowData.nodes[5]?.data?.content) {
-            const successMsg = flowData.nodes[5].data.content
+          if (flowData.nodes.length > 5) {
+            const successNodeData = safeGetNodeData(flowData.nodes[5]);
+            const successMsg = (successNodeData.content || 'Thanks for subscribing!')
               .replace('{subscriber_name}', userVariables.subscriber_name || '')
               .replace('{email_address}', userVariables.email_address || '');
             
@@ -279,11 +308,12 @@ export default function PlaygroundPage() {
             
             // Then ask about discount
             setTimeout(() => {
-              if (flowData.nodes.length > 6 && flowData.nodes[6]?.data) {
+              if (flowData.nodes.length > 6) {
+                const discountNodeData = safeGetNodeData(flowData.nodes[6]);
                 addPreviewMessage({ 
-                  text: flowData.nodes[6].data.content || 'Would you like to receive a special discount?', 
+                  text: discountNodeData.content || 'Would you like to receive a special discount?', 
                   isUser: false,
-                  options: flowData.nodes[6].data.options 
+                  options: discountNodeData.options 
                 });
                 setCurrentNode(6);
               }
@@ -294,9 +324,10 @@ export default function PlaygroundPage() {
       else if (contentText.includes('discount')) {
         // After discount question, ask for phone number
         setTimeout(() => {
-          if (flowData.nodes.length > 7 && flowData.nodes[7]?.data?.content) {
+          if (flowData.nodes.length > 7) {
+            const phoneNodeData = safeGetNodeData(flowData.nodes[7]);
             addPreviewMessage({ 
-              text: flowData.nodes[7].data.content, 
+              text: phoneNodeData.content || 'Please provide your phone number:', 
               isUser: false 
             });
             setCurrentNode(7);
