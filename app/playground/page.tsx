@@ -76,7 +76,7 @@ const sampleFlows = {
 
 interface NodeData {
   text?: string;
-  content?: string;
+  content?: string; // Keep as optional
   field?: string;
   condition?: string;
   options?: string[];
@@ -107,6 +107,17 @@ const initialFlowData: FlowData = {
   edges: []
 };
 
+// Directly address the line causing the error by adding a solution that doesn't depend on helper functions
+// Force TypeScript to accept direct access to properties
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const accessNodeData = (node: any, property: string, defaultValue: string): string => {
+  try {
+    return node?.data?.[property] || defaultValue;
+  } catch (error) {
+    return defaultValue;
+  }
+};
+
 // Update the flowData state to include the type:
 const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
 
@@ -124,7 +135,11 @@ type SafeFlowNode = FlowNode & {
 
 // Cast function to safely access node data
 const safeGetNodeData = (node: FlowNode | undefined): NodeData => {
-  return (node as SafeFlowNode)?.data || { content: '', options: [] };
+  if (!node || !node.data) {
+    return { content: '', options: [] };
+  }
+  // Force cast to the expected type
+  return { content: '', options: [], ...((node as any).data || {}) };
 };
 
 export default function PlaygroundPage() {
@@ -188,22 +203,14 @@ export default function PlaygroundPage() {
       // Move to next node (email collection)
       setTimeout(() => {
         try {
-          // Use a safe way to access the data that won't cause TypeScript errors
+          // Use our helper to safely access node data properties
           const node = flowData.nodes[0];
-          const nodeData = safeGetNodeData(node);
+          const content = accessNodeData(node, 'content', `Thanks, ${previewMessage}! Let's continue with our conversation.`);
           
-          if (nodeData.content) {
-            const nextMessage = nodeData.content.replace('{subscriber_name}', previewMessage);
-            addPreviewMessage({ text: nextMessage, isUser: false });
-            setCurrentNode(1);
-          } else {
-            // Fallback in case there's no data
-            addPreviewMessage({ 
-              text: `Thanks, ${previewMessage}! Let's continue with our conversation.`, 
-              isUser: false 
-            });
-            setCurrentNode(1);
-          }
+          // Now use the safely accessed content
+          const nextMessage = content.replace('{subscriber_name}', previewMessage);
+          addPreviewMessage({ text: nextMessage, isUser: false });
+          setCurrentNode(1);
         } catch (error) {
           // Just in case anything fails, provide a fallback
           addPreviewMessage({ 
@@ -216,8 +223,7 @@ export default function PlaygroundPage() {
     } 
     else if (currentNodeData?.type === 'collect-info') {
       // Handle info collection
-      const nodeData = safeGetNodeData(currentNodeData);
-      const fieldName = nodeData.field || '';
+      const fieldName = accessNodeData(currentNodeData, 'field', '');
       if (fieldName) {
         setUserVariables({...userVariables, [fieldName]: previewMessage});
         
@@ -227,11 +233,15 @@ export default function PlaygroundPage() {
             // Valid email - show topics
             setTimeout(() => {
               if (flowData.nodes.length > 3) {
-                const topicsNodeData = safeGetNodeData(flowData.nodes[3]);
+                const topicsNode = flowData.nodes[3];
+                const topicsContent = accessNodeData(topicsNode, 'content', 'What topics are you interested in?');
+                // Options need special handling since they're an array
+                const topicsOptions = topicsNode?.data?.options || [];
+                
                 addPreviewMessage({ 
-                  text: topicsNodeData.content || 'What topics are you interested in?', 
+                  text: topicsContent, 
                   isUser: false,
-                  options: topicsNodeData.options
+                  options: topicsOptions
                 });
                 setCurrentNode(3);
               }
@@ -240,9 +250,11 @@ export default function PlaygroundPage() {
             // Invalid email - show error
             setTimeout(() => {
               if (flowData.nodes.length > 2) {
-                const errorNodeData = safeGetNodeData(flowData.nodes[2]);
+                const errorContent = accessNodeData(flowData.nodes[2], 'content', 
+                  "That doesn't look like a valid email address. Please provide a valid email to continue.");
+                
                 addPreviewMessage({ 
-                  text: errorNodeData.content || "That doesn't look like a valid email address. Please provide a valid email to continue.", 
+                  text: errorContent, 
                   isUser: false 
                 });
               } else {
@@ -258,9 +270,10 @@ export default function PlaygroundPage() {
           // Phone number collected - show discount code
           setTimeout(() => {
             if (flowData.nodes.length > 8) {
-              const discountNodeData = safeGetNodeData(flowData.nodes[8]);
+              const discountContent = accessNodeData(flowData.nodes[8], 'content', 'Your discount code is WELCOME25!');
+              
               addPreviewMessage({ 
-                text: discountNodeData.content || 'Your discount code is WELCOME25!', 
+                text: discountContent, 
                 isUser: false 
               });
               setCurrentNode(8);
@@ -272,23 +285,25 @@ export default function PlaygroundPage() {
     else if (currentNodeData?.type === 'multi-choice') {
       // Handle multiple choice response
       // Find the index of the selected option
-      const nodeData = safeGetNodeData(currentNodeData);
-      const options = nodeData.options || [];
+      const options = currentNodeData?.data?.options || [];
       const selectedIndex = options.findIndex(
         opt => previewMessage.toLowerCase().includes(opt.toLowerCase())
       );
       
-      const contentText = nodeData.content || '';
+      const contentText = accessNodeData(currentNodeData, 'content', '');
       
       if (contentText.includes('topics')) {
         // After topics, ask about frequency
         setTimeout(() => {
           if (flowData.nodes.length > 4) {
-            const frequencyNodeData = safeGetNodeData(flowData.nodes[4]);
+            const frequencyContent = accessNodeData(flowData.nodes[4], 'content', 
+              'How often would you like to receive our newsletter?');
+            const frequencyOptions = flowData.nodes[4]?.data?.options || [];
+            
             addPreviewMessage({ 
-              text: frequencyNodeData.content || 'How often would you like to receive our newsletter?', 
+              text: frequencyContent, 
               isUser: false,
-              options: frequencyNodeData.options 
+              options: frequencyOptions 
             });
             setCurrentNode(4);
           }
@@ -298,8 +313,9 @@ export default function PlaygroundPage() {
         // After frequency, show success message
         setTimeout(() => {
           if (flowData.nodes.length > 5) {
-            const successNodeData = safeGetNodeData(flowData.nodes[5]);
-            const successMsg = (successNodeData.content || 'Thanks for subscribing!')
+            const successContent = accessNodeData(flowData.nodes[5], 'content', 'Thanks for subscribing!');
+            
+            const successMsg = successContent
               .replace('{subscriber_name}', userVariables.subscriber_name || '')
               .replace('{email_address}', userVariables.email_address || '');
             
@@ -309,11 +325,14 @@ export default function PlaygroundPage() {
             // Then ask about discount
             setTimeout(() => {
               if (flowData.nodes.length > 6) {
-                const discountNodeData = safeGetNodeData(flowData.nodes[6]);
+                const discountContent = accessNodeData(flowData.nodes[6], 'content', 
+                  'Would you like to receive a special discount?');
+                const discountOptions = flowData.nodes[6]?.data?.options || [];
+                
                 addPreviewMessage({ 
-                  text: discountNodeData.content || 'Would you like to receive a special discount?', 
+                  text: discountContent, 
                   isUser: false,
-                  options: discountNodeData.options 
+                  options: discountOptions 
                 });
                 setCurrentNode(6);
               }
@@ -325,9 +344,10 @@ export default function PlaygroundPage() {
         // After discount question, ask for phone number
         setTimeout(() => {
           if (flowData.nodes.length > 7) {
-            const phoneNodeData = safeGetNodeData(flowData.nodes[7]);
+            const phoneContent = accessNodeData(flowData.nodes[7], 'content', 'Please provide your phone number:');
+            
             addPreviewMessage({ 
-              text: phoneNodeData.content || 'Please provide your phone number:', 
+              text: phoneContent, 
               isUser: false 
             });
             setCurrentNode(7);
