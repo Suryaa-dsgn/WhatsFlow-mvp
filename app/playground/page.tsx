@@ -72,11 +72,43 @@ const sampleFlows = {
   }
 };
 
-// Empty initial flow data
-const initialFlowData = {
+// At the top of the file, add these type definitions:
+
+interface NodeData {
+  text?: string;
+  content?: string;
+  field?: string;
+  condition?: string;
+  options?: string[];
+}
+
+interface FlowNode {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data: NodeData;
+}
+
+interface FlowEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+}
+
+interface FlowData {
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+}
+
+// Replace the initialFlowData declaration with:
+const initialFlowData: FlowData = {
   nodes: [],
   edges: []
 };
+
+// Update the flowData state to include the type:
+const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
 
 // Type for WhatsApp preview messages
 type PreviewMessage = {
@@ -87,7 +119,7 @@ type PreviewMessage = {
 
 export default function PlaygroundPage() {
   const [flowDescription, setFlowDescription] = useState('');
-  const [flowData, setFlowData] = useState(initialFlowData);
+  const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
   const [flowName, setFlowName] = useState('Your WhatsApp Flow');
   const [flowDescription2, setFlowDescription2] = useState('Chat with the AI assistant to create your flow');
   const [currentMessage, setCurrentMessage] = useState('');
@@ -135,6 +167,8 @@ export default function PlaygroundPage() {
     addPreviewMessage({ text: previewMessage, isUser: true });
     
     // Process user response based on current node
+    if (currentNode < 0 || currentNode >= flowData.nodes.length) return;
+    
     const currentNodeData = flowData.nodes[currentNode];
     
     if (currentNode === 0) {
@@ -143,88 +177,130 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        const nextMessage = flowData.nodes[0].data.content.replace('{subscriber_name}', previewMessage);
-        addPreviewMessage({ text: nextMessage, isUser: false });
-        setCurrentNode(1);
+        // Check if flowData.nodes[0] exists before accessing its properties
+        if (flowData.nodes.length > 0 && flowData.nodes[0]?.data?.content) {
+          const nextMessage = flowData.nodes[0].data.content.replace('{subscriber_name}', previewMessage);
+          addPreviewMessage({ text: nextMessage, isUser: false });
+          setCurrentNode(1);
+        } else {
+          // Fallback in case there's no data
+          addPreviewMessage({ 
+            text: `Thanks, ${previewMessage}! Let's continue with our conversation.`, 
+            isUser: false 
+          });
+          setCurrentNode(1);
+        }
       }, 1000);
     } 
-    else if (currentNodeData.type === 'collect-info') {
+    else if (currentNodeData?.type === 'collect-info') {
       // Handle info collection
-      const fieldName = currentNodeData.data.field;
-      setUserVariables({...userVariables, [fieldName]: previewMessage});
-      
-      // Process conditional logic or move to next node
-      if (fieldName === 'email_address') {
-        if (previewMessage.includes('@')) {
-          // Valid email - show topics
+      const fieldName = currentNodeData?.data?.field || '';
+      if (fieldName) {
+        setUserVariables({...userVariables, [fieldName]: previewMessage});
+        
+        // Process conditional logic or move to next node
+        if (fieldName === 'email_address') {
+          if (previewMessage.includes('@')) {
+            // Valid email - show topics
+            setTimeout(() => {
+              if (flowData.nodes.length > 3 && flowData.nodes[3]?.data) {
+                addPreviewMessage({ 
+                  text: flowData.nodes[3].data.content || 'What topics are you interested in?', 
+                  isUser: false,
+                  options: flowData.nodes[3].data.options
+                });
+                setCurrentNode(3);
+              }
+            }, 1000);
+          } else {
+            // Invalid email - show error
+            setTimeout(() => {
+              if (flowData.nodes.length > 2 && flowData.nodes[2]?.data?.content) {
+                addPreviewMessage({ 
+                  text: flowData.nodes[2].data.content, 
+                  isUser: false 
+                });
+              } else {
+                addPreviewMessage({ 
+                  text: "That doesn't look like a valid email address. Please provide a valid email to continue.", 
+                  isUser: false 
+                });
+              }
+              // Don't advance the node - keep at email collection
+            }, 1000);
+          }
+        } else if (fieldName === 'phone_number') {
+          // Phone number collected - show discount code
           setTimeout(() => {
-            addPreviewMessage({ 
-              text: flowData.nodes[3].data.content, 
-              isUser: false,
-              options: flowData.nodes[3].data.options
-            });
-            setCurrentNode(3);
-          }, 1000);
-        } else {
-          // Invalid email - show error
-          setTimeout(() => {
-            addPreviewMessage({ text: flowData.nodes[2].data.content, isUser: false });
-            // Don't advance the node - keep at email collection
+            if (flowData.nodes.length > 8 && flowData.nodes[8]?.data?.content) {
+              addPreviewMessage({ 
+                text: flowData.nodes[8].data.content, 
+                isUser: false 
+              });
+              setCurrentNode(8);
+            }
           }, 1000);
         }
-      } else if (fieldName === 'phone_number') {
-        // Phone number collected - show discount code
-        setTimeout(() => {
-          addPreviewMessage({ text: flowData.nodes[8].data.content, isUser: false });
-          setCurrentNode(8);
-        }, 1000);
       }
     }
-    else if (currentNodeData.type === 'multi-choice') {
+    else if (currentNodeData?.type === 'multi-choice') {
       // Handle multiple choice response
       // Find the index of the selected option
-      const options = currentNodeData.data.options;
+      const options = currentNodeData?.data?.options || [];
       const selectedIndex = options.findIndex(
         opt => previewMessage.toLowerCase().includes(opt.toLowerCase())
       );
       
-      if (currentNodeData.data.content.includes('topics')) {
+      const contentText = currentNodeData?.data?.content || '';
+      
+      if (contentText.includes('topics')) {
         // After topics, ask about frequency
         setTimeout(() => {
-          addPreviewMessage({ 
-            text: flowData.nodes[4].data.content, 
-            isUser: false,
-            options: flowData.nodes[4].data.options 
-          });
-          setCurrentNode(4);
+          if (flowData.nodes.length > 4 && flowData.nodes[4]?.data) {
+            addPreviewMessage({ 
+              text: flowData.nodes[4].data.content || 'How often would you like to receive our newsletter?', 
+              isUser: false,
+              options: flowData.nodes[4].data.options 
+            });
+            setCurrentNode(4);
+          }
         }, 1000);
       }
-      else if (currentNodeData.data.content.includes('frequency')) {
+      else if (contentText.includes('frequency')) {
         // After frequency, show success message
         setTimeout(() => {
-          const successMsg = flowData.nodes[5].data.content
-            .replace('{subscriber_name}', userVariables.subscriber_name)
-            .replace('{email_address}', userVariables.email_address);
-          
-          addPreviewMessage({ text: successMsg, isUser: false });
-          setCurrentNode(5);
-          
-          // Then ask about discount
-          setTimeout(() => {
-            addPreviewMessage({ 
-              text: flowData.nodes[6].data.content, 
-              isUser: false,
-              options: flowData.nodes[6].data.options 
-            });
-            setCurrentNode(6);
-          }, 2000);
+          if (flowData.nodes.length > 5 && flowData.nodes[5]?.data?.content) {
+            const successMsg = flowData.nodes[5].data.content
+              .replace('{subscriber_name}', userVariables.subscriber_name || '')
+              .replace('{email_address}', userVariables.email_address || '');
+            
+            addPreviewMessage({ text: successMsg, isUser: false });
+            setCurrentNode(5);
+            
+            // Then ask about discount
+            setTimeout(() => {
+              if (flowData.nodes.length > 6 && flowData.nodes[6]?.data) {
+                addPreviewMessage({ 
+                  text: flowData.nodes[6].data.content || 'Would you like to receive a special discount?', 
+                  isUser: false,
+                  options: flowData.nodes[6].data.options 
+                });
+                setCurrentNode(6);
+              }
+            }, 2000);
+          }
         }, 1000);
       }
-      else if (currentNodeData.data.content.includes('discount')) {
+      else if (contentText.includes('discount')) {
         // After discount question, ask for phone number
         setTimeout(() => {
-          addPreviewMessage({ text: flowData.nodes[7].data.content, isUser: false });
-          setCurrentNode(7);
+          if (flowData.nodes.length > 7 && flowData.nodes[7]?.data?.content) {
+            addPreviewMessage({ 
+              text: flowData.nodes[7].data.content, 
+              isUser: false 
+            });
+            setCurrentNode(7);
+          }
         }, 1000);
       }
     }
