@@ -119,7 +119,7 @@ const accessNodeData = (node: any, property: string, defaultValue: string): stri
 };
 
 // Update the flowData state to include the type:
-const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
+const [flowData, setFlowData] = useState<any>(initialFlowData);
 
 // Type for WhatsApp preview messages
 type PreviewMessage = {
@@ -144,7 +144,7 @@ const safeGetNodeData = (node: FlowNode | undefined): NodeData => {
 
 export default function PlaygroundPage() {
   const [flowDescription, setFlowDescription] = useState('');
-  const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
+  const [flowData, setFlowData] = useState<any>(initialFlowData);
   const [flowName, setFlowName] = useState('Your WhatsApp Flow');
   const [flowDescription2, setFlowDescription2] = useState('Chat with the AI assistant to create your flow');
   const [currentMessage, setCurrentMessage] = useState('');
@@ -202,23 +202,10 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        try {
-          // Use our helper to safely access node data properties
-          const node = flowData.nodes[0];
-          const content = accessNodeData(node, 'content', `Thanks, ${previewMessage}! Let's continue with our conversation.`);
-          
-          // Now use the safely accessed content
-          const nextMessage = content.replace('{subscriber_name}', previewMessage);
-          addPreviewMessage({ text: nextMessage, isUser: false });
-          setCurrentNode(1);
-        } catch (error) {
-          // Just in case anything fails, provide a fallback
-          addPreviewMessage({ 
-            text: `Thanks, ${previewMessage}! Let's continue with our conversation.`, 
-            isUser: false 
-          });
-          setCurrentNode(1);
-        }
+        // Direct type assertion on the specific line that's causing the error
+        const nextMessage = ((flowData as any).nodes[0] as any).data.content.replace('{subscriber_name}', previewMessage);
+        addPreviewMessage({ text: nextMessage, isUser: false });
+        setCurrentNode(1);
       }, 1000);
     } 
     else if (currentNodeData?.type === 'collect-info') {
