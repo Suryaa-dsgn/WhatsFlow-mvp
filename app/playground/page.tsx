@@ -202,8 +202,28 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        // Direct type assertion on the specific line that's causing the error
-        const nextMessage = ((flowData as any).nodes[0] as any).data.content.replace('{subscriber_name}', previewMessage);
+        // FIXED: Avoid property access chains that TypeScript doesn't like
+        let nextMessage = `Thanks, ${previewMessage}! Please provide your email address:`;
+        
+        // Only try to access properties if we're sure they exist
+        try {
+          if (flowData && 
+              Array.isArray(flowData.nodes) && 
+              flowData.nodes.length > 0 && 
+              typeof flowData.nodes[0] === 'object' && 
+              flowData.nodes[0] !== null) {
+            
+            // Use optional chaining with a fallback to ensure we have a string
+            const content = flowData.nodes[0]?.data?.content;
+            if (typeof content === 'string') {
+              nextMessage = content.replace('{subscriber_name}', previewMessage);
+            }
+          }
+        } catch (e) {
+          console.log('Error accessing node content', e);
+          // Keep the default message if there's an error
+        }
+        
         addPreviewMessage({ text: nextMessage, isUser: false });
         setCurrentNode(1);
       }, 1000);
