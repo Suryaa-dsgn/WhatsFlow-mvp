@@ -72,11 +72,10 @@ const sampleFlows = {
   }
 };
 
-// At the top of the file, add these type definitions:
-
+// Define types for node data and flow
 interface NodeData {
   text?: string;
-  content?: string; // Keep as optional
+  content?: string;
   field?: string;
   condition?: string;
   options?: string[];
@@ -101,25 +100,11 @@ interface FlowData {
   edges: FlowEdge[];
 }
 
-// Replace the initialFlowData declaration with:
+// Safe empty initial data
 const initialFlowData: FlowData = {
   nodes: [],
   edges: []
 };
-
-// Directly address the line causing the error by adding a solution that doesn't depend on helper functions
-// Force TypeScript to accept direct access to properties
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const accessNodeData = (node: any, property: string, defaultValue: string): string => {
-  try {
-    return node?.data?.[property] || defaultValue;
-  } catch (error) {
-    return defaultValue;
-  }
-};
-
-// Update the flowData state to include the type:
-const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
 
 // Type for WhatsApp preview messages
 type PreviewMessage = {
@@ -128,18 +113,32 @@ type PreviewMessage = {
   options?: string[];
 };
 
-// Improve the type safety of findIndex to prevent 'never' type issues
-type SafeFlowNode = FlowNode & {
-  data: NodeData;
+// Safe accessor function for node data and its properties
+const getNodeProperty = (nodes: FlowNode[], index: number, property: string, defaultValue: string): string => {
+  if (!nodes || !Array.isArray(nodes) || nodes.length <= index) {
+    return defaultValue;
+  }
+  
+  const node = nodes[index];
+  if (!node || !node.data || typeof node.data[property as keyof NodeData] !== 'string') {
+    return defaultValue;
+  }
+  
+  return node.data[property as keyof NodeData] as string || defaultValue;
 };
 
-// Cast function to safely access node data
-const safeGetNodeData = (node: FlowNode | undefined): NodeData => {
-  if (!node || !node.data) {
-    return { content: '', options: [] };
+// Safe accessor for node options
+const getNodeOptions = (nodes: FlowNode[], index: number): string[] => {
+  if (!nodes || !Array.isArray(nodes) || nodes.length <= index) {
+    return [];
   }
-  // Force cast to the expected type
-  return { content: '', options: [], ...((node as any).data || {}) };
+  
+  const node = nodes[index];
+  if (!node || !node.data || !Array.isArray(node.data.options)) {
+    return [];
+  }
+  
+  return node.data.options;
 };
 
 export default function PlaygroundPage() {
@@ -202,17 +201,15 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        // COMPLETELY DIFFERENT IMPLEMENTATION THAT AVOIDS TYPE ERRORS
-        // Instead of accessing nested properties, use a hardcoded message
-        const greeting = `Thanks, ${previewMessage}! Please provide your email address:`;
-        
+        // Safe string that avoids property access chain errors
+        let greeting = `Thanks, ${previewMessage}! Please provide your email address:`;
         addPreviewMessage({ text: greeting, isUser: false });
         setCurrentNode(1);
       }, 1000);
     } 
     else if (currentNodeData?.type === 'collect-info') {
       // Handle info collection
-      const fieldName = accessNodeData(currentNodeData, 'field', '');
+      const fieldName = getNodeProperty(flowData.nodes, currentNode, 'field', '');
       if (fieldName) {
         setUserVariables({...userVariables, [fieldName]: previewMessage});
         
@@ -222,10 +219,8 @@ export default function PlaygroundPage() {
             // Valid email - show topics
             setTimeout(() => {
               if (flowData.nodes.length > 3) {
-                const topicsNode = flowData.nodes[3];
-                const topicsContent = accessNodeData(topicsNode, 'content', 'What topics are you interested in?');
-                // Options need special handling since they're an array
-                const topicsOptions = topicsNode?.data?.options || [];
+                const topicsContent = getNodeProperty(flowData.nodes, 3, 'content', 'What topics are you interested in?');
+                const topicsOptions = getNodeOptions(flowData.nodes, 3);
                 
                 addPreviewMessage({ 
                   text: topicsContent, 
@@ -239,7 +234,7 @@ export default function PlaygroundPage() {
             // Invalid email - show error
             setTimeout(() => {
               if (flowData.nodes.length > 2) {
-                const errorContent = accessNodeData(flowData.nodes[2], 'content', 
+                const errorContent = getNodeProperty(flowData.nodes, 2, 'content', 
                   "That doesn't look like a valid email address. Please provide a valid email to continue.");
                 
                 addPreviewMessage({ 
@@ -259,7 +254,7 @@ export default function PlaygroundPage() {
           // Phone number collected - show discount code
           setTimeout(() => {
             if (flowData.nodes.length > 8) {
-              const discountContent = accessNodeData(flowData.nodes[8], 'content', 'Your discount code is WELCOME25!');
+              const discountContent = getNodeProperty(flowData.nodes, 8, 'content', 'Your discount code is WELCOME25!');
               
               addPreviewMessage({ 
                 text: discountContent, 
@@ -279,15 +274,15 @@ export default function PlaygroundPage() {
         (opt: string) => previewMessage.toLowerCase().includes(opt.toLowerCase())
       );
       
-      const contentText = accessNodeData(currentNodeData, 'content', '');
+      const contentText = getNodeProperty(flowData.nodes, currentNode, 'content', '');
       
       if (contentText.includes('topics')) {
         // After topics, ask about frequency
         setTimeout(() => {
           if (flowData.nodes.length > 4) {
-            const frequencyContent = accessNodeData(flowData.nodes[4], 'content', 
+            const frequencyContent = getNodeProperty(flowData.nodes, 4, 'content', 
               'How often would you like to receive our newsletter?');
-            const frequencyOptions = flowData.nodes[4]?.data?.options || [];
+            const frequencyOptions = getNodeOptions(flowData.nodes, 4);
             
             addPreviewMessage({ 
               text: frequencyContent, 
@@ -302,7 +297,7 @@ export default function PlaygroundPage() {
         // After frequency, show success message
         setTimeout(() => {
           if (flowData.nodes.length > 5) {
-            const successContent = accessNodeData(flowData.nodes[5], 'content', 'Thanks for subscribing!');
+            const successContent = getNodeProperty(flowData.nodes, 5, 'content', 'Thanks for subscribing!');
             
             const successMsg = successContent
               .replace('{subscriber_name}', userVariables.subscriber_name || '')
@@ -314,9 +309,9 @@ export default function PlaygroundPage() {
             // Then ask about discount
             setTimeout(() => {
               if (flowData.nodes.length > 6) {
-                const discountContent = accessNodeData(flowData.nodes[6], 'content', 
+                const discountContent = getNodeProperty(flowData.nodes, 6, 'content', 
                   'Would you like to receive a special discount?');
-                const discountOptions = flowData.nodes[6]?.data?.options || [];
+                const discountOptions = getNodeOptions(flowData.nodes, 6);
                 
                 addPreviewMessage({ 
                   text: discountContent, 
@@ -333,7 +328,7 @@ export default function PlaygroundPage() {
         // After discount question, ask for phone number
         setTimeout(() => {
           if (flowData.nodes.length > 7) {
-            const phoneContent = accessNodeData(flowData.nodes[7], 'content', 'Please provide your phone number:');
+            const phoneContent = getNodeProperty(flowData.nodes, 7, 'content', 'Please provide your phone number:');
             
             addPreviewMessage({ 
               text: phoneContent, 
