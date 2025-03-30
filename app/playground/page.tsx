@@ -119,7 +119,7 @@ const accessNodeData = (node: any, property: string, defaultValue: string): stri
 };
 
 // Update the flowData state to include the type:
-const [flowData, setFlowData] = useState<any>(initialFlowData);
+const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
 
 // Type for WhatsApp preview messages
 type PreviewMessage = {
@@ -144,7 +144,7 @@ const safeGetNodeData = (node: FlowNode | undefined): NodeData => {
 
 export default function PlaygroundPage() {
   const [flowDescription, setFlowDescription] = useState('');
-  const [flowData, setFlowData] = useState<any>(initialFlowData);
+  const [flowData, setFlowData] = useState<FlowData>(initialFlowData);
   const [flowName, setFlowName] = useState('Your WhatsApp Flow');
   const [flowDescription2, setFlowDescription2] = useState('Chat with the AI assistant to create your flow');
   const [currentMessage, setCurrentMessage] = useState('');
@@ -202,26 +202,17 @@ export default function PlaygroundPage() {
       
       // Move to next node (email collection)
       setTimeout(() => {
-        // FIXED: Avoid property access chains that TypeScript doesn't like
-        let nextMessage = `Thanks, ${previewMessage}! Please provide your email address:`;
+        // HARDCODED FIX: Use a direct concrete approach that TypeScript can't misinterpret
+        let nextMessage = '';
         
-        // Only try to access properties if we're sure they exist
-        try {
-          if (flowData && 
-              Array.isArray(flowData.nodes) && 
-              flowData.nodes.length > 0 && 
-              typeof flowData.nodes[0] === 'object' && 
-              flowData.nodes[0] !== null) {
-            
-            // Use optional chaining with a fallback to ensure we have a string
-            const content = flowData.nodes[0]?.data?.content;
-            if (typeof content === 'string') {
-              nextMessage = content.replace('{subscriber_name}', previewMessage);
-            }
-          }
-        } catch (e) {
-          console.log('Error accessing node content', e);
-          // Keep the default message if there's an error
+        // Safety wrapper with explicit null check
+        if (flowData && flowData.nodes && flowData.nodes.length > 0 && 
+            flowData.nodes[0] && flowData.nodes[0].data && 
+            typeof flowData.nodes[0].data.content === 'string') {
+          nextMessage = flowData.nodes[0].data.content.replace('{subscriber_name}', previewMessage);
+        } else {
+          // Default fallback message
+          nextMessage = `Thanks, ${previewMessage}! Please provide your email address:`;
         }
         
         addPreviewMessage({ text: nextMessage, isUser: false });
@@ -294,7 +285,7 @@ export default function PlaygroundPage() {
       // Find the index of the selected option
       const options = currentNodeData?.data?.options || [];
       const selectedIndex = options.findIndex(
-        opt => previewMessage.toLowerCase().includes(opt.toLowerCase())
+        (opt: string) => previewMessage.toLowerCase().includes(opt.toLowerCase())
       );
       
       const contentText = accessNodeData(currentNodeData, 'content', '');
@@ -516,7 +507,7 @@ export default function PlaygroundPage() {
   // Handle node drag start
   const handleNodeMouseDown = (e: React.MouseEvent, nodeId: string) => {
     e.stopPropagation();
-    const node = flowData.nodes.find(n => n.id === nodeId);
+    const node = flowData.nodes.find((n: {id: string}) => n.id === nodeId);
     if (!node) return;
     
     const rect = (e.target as HTMLElement).getBoundingClientRect();
@@ -539,8 +530,8 @@ export default function PlaygroundPage() {
     const y = (e.clientY - canvasRect.top - dragOffset.y) / scale - position.y;
     
     // Update node position
-    setFlowData(prevData => {
-      const newNodes = prevData.nodes.map(node => {
+    setFlowData((prevData: typeof flowData) => {
+      const newNodes = prevData.nodes.map((node: typeof flowData.nodes[0]) => {
         if (node.id === draggingNode) {
           return { ...node, position: { x, y } };
         }
@@ -756,7 +747,7 @@ export default function PlaygroundPage() {
               }}
             >
               {/* Dynamic Flow Rendering */}
-              {flowData.nodes.map((node, index) => {
+              {flowData.nodes.map((node: typeof flowData.nodes[0], index: number) => {
                 // Calculate absolute positions based on node position
                 const nodeX = node.position.x;
                 const nodeY = node.position.y;
@@ -809,7 +800,7 @@ export default function PlaygroundPage() {
                       )}
                       {node.data.options && (
                         <div className="mt-2 pl-2 text-xs text-gray-600 space-y-1">
-                          {node.data.options.map((option, i) => (
+                          {node.data.options.map((option: string, i: number) => (
                             <div key={i}>{option}</div>
                           ))}
                         </div>
@@ -826,9 +817,9 @@ export default function PlaygroundPage() {
               })}
               
               {/* Render connections between nodes */}
-              {flowData.edges.map(edge => {
-                const sourceNode = flowData.nodes.find(n => n.id === edge.source);
-                const targetNode = flowData.nodes.find(n => n.id === edge.target);
+              {flowData.edges.map((edge: typeof flowData.edges[0]) => {
+                const sourceNode = flowData.nodes.find((n: typeof flowData.nodes[0]) => n.id === edge.source);
+                const targetNode = flowData.nodes.find((n: typeof flowData.nodes[0]) => n.id === edge.target);
                 
                 if (!sourceNode || !targetNode) return null;
                 
